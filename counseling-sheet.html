@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Counseling Sheet</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green: #8B7355;
+  --gold: #C4A96A;
+  --bg: #F5EDE0;
+  --card: #ffffff;
+  --border: #ddd;
+  --text: #1a1a1a;
+  --muted: #777;
+  --radius: 12px;
+  --danger: #c0392b;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+body {
+  font-family:'Noto Serif JP',serif;
+  font-size:15px;
+  color:var(--text);
+  background:var(--bg);
+  min-height:100vh;
+}
+
+/* ===== SCREENS ===== */
+.screen { display:none; }
+.screen.active { display:block; }
+
+/* ===== CUSTOMER FORM ===== */
+#customerScreen { padding-bottom:100px; }
+
+.c-header {
+  background:var(--green);
+  color:white;
+  text-align:center;
+  padding:28px 16px 22px;
+}
+.c-header h1 { font-size:22px; font-weight:700; letter-spacing:0.1em; margin-bottom:4px; }
+.c-header p  { font-size:12px; opacity:0.85; }
+.c-header-inner { display:flex; align-items:center; justify-content:space-between; }
+.c-header-center { flex:1; text-align:center; }
+.secret-btn {
+  background: transparent;
+  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.prog-wrap {
+  background:white;
+  padding:10px 16px;
+  border-bottom:1px solid var(--border);
+  position:sticky; top:0; z-index:100;
+  box-shadow:0 1px 4px rgba(0,0,0,.06);
+}
+.prog-labels { display:flex; justify-content:space-between; font-size:10px; color:var(--muted); margin-bottom:5px; }
+.prog-bg { height:4px; background:#e0d8cc; border-radius:2px; overflow:hidden; }
+.prog-fill { height:100%; background:var(--green); border-radius:2px; transition:width .3s; width:0%; }
+
+.section {
+  margin:14px 12px 0;
+  background:var(--card);
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:0 1px 4px rgba(0,0,0,.06);
+}
+.sec-hd {
+  background:var(--green);
+  color:white;
+  padding:10px 16px;
+  font-size:13px; font-weight:700; letter-spacing:.08em;
+  display:flex; align-items:center; gap:8px;
+}
+.sec-num {
+  background:rgba(255,255,255,.25);
+  border-radius:50%; width:22px; height:22px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:700; flex-shrink:0;
+}
+
+.field { padding:14px 16px; border-bottom:1px solid var(--border); }
+.field:last-child { border-bottom:none; }
+.field-label { font-size:12px; font-weight:700; color:var(--muted); margin-bottom:8px; letter-spacing:.05em; }
+.req { color:var(--danger); font-size:10px; margin-left:4px; }
+
+input[type=text],input[type=tel],input[type=date],input[type=number],select,textarea {
+  width:100%; padding:12px 14px;
+  border:1.5px solid var(--border); border-radius:8px;
+  font-family:inherit; font-size:15px; color:var(--text);
+  background:white; outline:none; transition:border-color .2s;
+  appearance:none; -webkit-appearance:none;
+}
+input:focus,select:focus,textarea:focus {
+  border-color:var(--green);
+  box-shadow:0 0 0 3px rgba(139,115,85,.12);
+}
+select {
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%23999'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 14px center; padding-right:36px;
+}
+textarea { min-height:88px; resize:vertical; line-height:1.6; }
+.row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+/* Chips */
+.chip-group { display:flex; flex-wrap:wrap; gap:8px; }
+.chip {
+  display:inline-flex; align-items:center; gap:5px;
+  padding:9px 14px; border:1.5px solid var(--border);
+  border-radius:24px; font-size:13px; cursor:pointer;
+  transition:all .15s; user-select:none;
+  background:white; color:var(--text);
+}
+.chip input { display:none; }
+.chip:active { transform:scale(.96); }
+.chip.selected { background:var(--green); border-color:var(--green); color:white; font-weight:500; }
+
+/* Scale */
+.scale-group { display:flex; border:1.5px solid var(--border); border-radius:8px; overflow:hidden; }
+.scale-item {
+  flex:1; text-align:center; cursor:pointer;
+  padding:11px 4px; font-size:13px;
+  border-right:1px solid var(--border);
+  transition:all .15s; user-select:none;
+}
+.scale-item:last-child { border-right:none; }
+.scale-item input { display:none; }
+.scale-item.selected { background:var(--green); color:white; font-weight:600; }
+
+/* Policy */
+.policy-box {
+  margin:14px 12px 0;
+  background:var(--card); border-radius:var(--radius);
+  overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,.06);
+}
+.pol-hd { background:#333; color:white; padding:10px 16px; font-size:13px; font-weight:700; letter-spacing:.06em; }
+.pol-body { padding:16px; font-size:12px; line-height:1.9; }
+.pol-body h4 { font-size:13px; font-weight:700; margin-bottom:6px; border-left:3px solid var(--green); padding-left:8px; }
+.pol-body .hl { color:var(--danger); font-weight:700; }
+
+.agree-wrap { padding:14px 16px; border-top:1px solid var(--border); }
+.agree-chip {
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  padding:16px; border:2px solid var(--border); border-radius:10px;
+  font-size:16px; font-weight:700; cursor:pointer; transition:all .2s; user-select:none;
+}
+.agree-chip input { display:none; }
+.agree-box {
+  width:24px; height:24px; border:2px solid var(--border); border-radius:5px;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .2s; flex-shrink:0; font-size:14px; color:transparent;
+}
+.agree-chip.selected { border-color:var(--green); background:#f0f3e8; }
+.agree-chip.selected .agree-box { background:var(--green); border-color:var(--green); color:white; }
+
+/* Bottom bar */
+.bottom-bar {
+  position:fixed; bottom:0; left:0; right:0;
+  padding:12px 16px; background:white;
+  border-top:1px solid var(--border);
+  box-shadow:0 -2px 12px rgba(0,0,0,.08);
+  display:flex; gap:10px; z-index:200;
+}
+.btn-reset {
+  flex:0 0 auto; padding:14px 18px;
+  border:1.5px solid var(--border); border-radius:8px;
+  background:white; font-family:inherit; font-size:14px; color:var(--muted); cursor:pointer;
+}
+.btn-submit {
+  flex:1; padding:14px; background:var(--green); color:white;
+  border:none; border-radius:8px; font-family:inherit;
+  font-size:15px; font-weight:700; cursor:pointer; letter-spacing:.05em; transition:opacity .2s;
+}
+.btn-submit:active { opacity:.85; }
+
+/* ===== THANKS SCREEN ===== */
+#thanksScreen {
+  display:none;
+  min-height:100vh;
+  background:var(--bg);
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:40px 24px;
+  text-align:center;
+}
+#thanksScreen.active { display:flex; }
+.thanks-icon { font-size:56px; margin-bottom:20px; }
+.thanks-title { font-size:22px; font-weight:700; color:var(--green); margin-bottom:12px; }
+.thanks-msg { font-size:14px; color:var(--muted); line-height:1.8; }
+
+/* ===== LOGIN SCREEN ===== */
+#loginScreen {
+  display:none;
+  min-height:100vh;
+  background:var(--bg);
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:40px 24px;
+}
+#loginScreen.active { display:flex; }
+.login-card {
+  background:white; border-radius:var(--radius);
+  padding:32px 28px; width:100%; max-width:360px;
+  box-shadow:0 4px 20px rgba(0,0,0,.1);
+}
+.login-card h2 { text-align:center; font-size:18px; font-weight:700; color:var(--green); margin-bottom:6px; }
+.login-card p { text-align:center; font-size:12px; color:var(--muted); margin-bottom:24px; }
+.login-field { margin-bottom:16px; }
+.login-field label { display:block; font-size:12px; font-weight:700; color:var(--muted); margin-bottom:6px; }
+.btn-login {
+  width:100%; padding:14px; background:var(--green); color:white;
+  border:none; border-radius:8px; font-family:inherit;
+  font-size:15px; font-weight:700; cursor:pointer; letter-spacing:.05em;
+}
+.login-err { color:var(--danger); font-size:12px; text-align:center; margin-top:10px; display:none; }
+.login-back { text-align:center; margin-top:16px; font-size:12px; color:var(--muted); cursor:pointer; text-decoration:underline; }
+
+/* ===== ADMIN SCREEN ===== */
+#adminScreen { display:none; padding-bottom:40px; }
+#adminScreen.active { display:block; }
+
+.admin-header {
+  background:var(--green); color:white;
+  padding:20px 16px 16px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.admin-header h1 { font-size:17px; font-weight:700; letter-spacing:.08em; }
+.btn-logout {
+  background:rgba(255,255,255,.2); border:none; color:white;
+  padding:6px 14px; border-radius:20px; font-size:12px; cursor:pointer; font-family:inherit;
+}
+
+.admin-tabs {
+  display:flex; background:white; border-bottom:2px solid var(--border);
+  position:sticky; top:0; z-index:100;
+}
+.admin-tab {
+  flex:1; padding:13px 8px; text-align:center;
+  font-size:13px; font-weight:500; cursor:pointer;
+  border-bottom:2px solid transparent; margin-bottom:-2px;
+  color:var(--muted); transition:all .2s;
+}
+.admin-tab.active { color:var(--green); border-bottom-color:var(--green); font-weight:700; }
+
+.tab-content { display:none; padding:16px 12px; }
+.tab-content.active { display:block; }
+
+/* Submissions list */
+.sub-card {
+  background:white; border-radius:var(--radius);
+  padding:16px; margin-bottom:12px;
+  box-shadow:0 1px 4px rgba(0,0,0,.06);
+}
+.sub-card-hd {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:10px;
+}
+.sub-name { font-weight:700; font-size:15px; }
+.sub-date { font-size:11px; color:var(--muted); }
+.sub-tags { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.sub-tag {
+  background:#f0f3e8; color:var(--green);
+  font-size:11px; padding:3px 10px; border-radius:12px; font-weight:500;
+}
+.btn-pdf {
+  width:100%; padding:10px; background:var(--gold); color:white;
+  border:none; border-radius:8px; font-family:inherit;
+  font-size:13px; font-weight:700; cursor:pointer;
+}
+.no-data { text-align:center; color:var(--muted); font-size:14px; padding:40px 0; }
+
+/* Settings */
+.setting-group {
+  background:white; border-radius:var(--radius);
+  overflow:hidden; margin-bottom:16px;
+  box-shadow:0 1px 4px rgba(0,0,0,.06);
+}
+.setting-hd {
+  padding:12px 16px; background:var(--bg);
+  font-size:12px; font-weight:700; color:var(--muted);
+  letter-spacing:.05em; border-bottom:1px solid var(--border);
+}
+.setting-row { padding:14px 16px; border-bottom:1px solid var(--border); }
+.setting-row:last-child { border-bottom:none; }
+.setting-label { font-size:12px; font-weight:700; color:var(--muted); margin-bottom:6px; }
+.setting-row input[type=text], .setting-row textarea {
+  border:1.5px solid var(--border); border-radius:8px;
+  padding:10px 12px; font-size:14px; width:100%; font-family:inherit;
+  background:white; outline:none;
+}
+.setting-row input:focus, .setting-row textarea:focus { border-color:var(--green); }
+.setting-row textarea { min-height:80px; resize:vertical; line-height:1.6; }
+.btn-save {
+  width:100%; padding:14px; background:var(--green); color:white;
+  border:none; border-radius:8px; font-family:inherit;
+  font-size:15px; font-weight:700; cursor:pointer; margin-top:4px;
+}
+.save-ok { color:var(--green); font-size:13px; text-align:center; margin-top:10px; display:none; }
+
+/* Password change */
+.pw-field { margin-bottom:10px; }
+.pw-field label { display:block; font-size:12px; font-weight:700; color:var(--muted); margin-bottom:5px; }
+
+/* Admin entry link */
+.admin-link-wrap {
+  text-align:center; margin-top:14px; padding-top:14px;
+  border-top:1px solid var(--border);
+}
+.admin-link {
+  font-size:12px; color:var(--muted); cursor:pointer; text-decoration:underline;
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  body { background:white; }
+  #customerScreen,#thanksScreen,#loginScreen { display:none !important; }
+  #adminScreen { display:none !important; }
+  #printArea { display:block !important; }
+  .no-print { display:none !important; }
+}
+
+#printArea {
+  display:none;
+  font-family:'Noto Serif JP',serif;
+  font-size:11pt;
+  color:#111;
+  padding:20pt 24pt;
+}
+
+.print-title { text-align:center; font-size:18pt; font-weight:700; margin-bottom:4pt; }
+.print-sub { text-align:center; font-size:10pt; color:#555; margin-bottom:14pt; }
+.print-table { width:100%; border-collapse:collapse; margin-bottom:12pt; }
+.print-table td { border:1pt solid #bbb; padding:6pt 8pt; font-size:10pt; vertical-align:top; }
+.print-table .lbl { background:#f5f0e8; font-weight:700; width:90pt; white-space:nowrap; }
+.print-chips { display:flex; flex-wrap:wrap; gap:5pt; }
+.print-chip {
+  padding:3pt 9pt; border-radius:12pt; font-size:9pt;
+  background:#8B7355; color:white;
+  -webkit-print-color-adjust:exact; print-color-adjust:exact;
+}
+.print-policy { font-size:9pt; line-height:1.8; border-top:1pt solid #bbb; padding-top:10pt; margin-top:6pt; }
+.print-policy h4 { font-size:10pt; font-weight:700; margin-bottom:4pt; }
+.print-policy .hl { color:#c0392b; font-weight:700; }
+.print-agree { font-size:14pt; font-weight:700; text-align:center; margin-top:14pt; border:1pt solid #bbb; padding:10pt; }
+
+/* ===== APP LOCK ===== */
+.app-lock {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  padding: 40px 32px 80px;
+}
+.app-lock.hidden { display: none; }
+.lock-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px;
+  font-style: italic;
+  color: var(--green);
+  margin-bottom: 4px;
+  letter-spacing: 2px;
+}
+.lock-sub {
+  font-size: 11px;
+  color: #C8BEA8;
+  letter-spacing: 0.2em;
+  margin-bottom: 40px;
+}
+.lock-icon { font-size: 40px; margin-bottom: 14px; }
+.lock-title {
+  font-size: 20px;
+  color: var(--green);
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+.lock-desc {
+  font-size: 12px;
+  color: #8A8070;
+  margin-bottom: 24px;
+  text-align: center;
+  line-height: 1.8;
+}
+.lock-input {
+  width: 100%;
+  padding: 16px;
+  border: 1px solid #E4DAC8;
+  border-radius: 12px;
+  font-size: 18px;
+  text-align: center;
+  letter-spacing: 6px;
+  outline: none;
+  font-family: inherit;
+  background: white;
+  margin-bottom: 12px;
+  transition: border-color 0.2s;
+  color: var(--text);
+}
+.lock-input:focus { border-color: var(--green); }
+.lock-input.error { border-color: #c06060; animation: shake 0.3s; }
+.lock-btn {
+  width: 100%;
+  padding: 18px;
+  background: var(--green);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-family: inherit;
+  cursor: pointer;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  transition: all 0.2s;
+  margin-bottom: 12px;
+  -webkit-appearance: none;
+}
+.lock-btn:active { opacity: 0.85; }
+.lock-err {
+  font-size: 12px;
+  color: #c06060;
+  text-align: center;
+  display: none;
+}
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== APP LOCK ===== -->
+<div class="app-lock" id="appLock">
+  <div class="lock-logo">salon en.</div>
+  <div class="lock-sub">COUNSELING SHEET</div>
+  <div class="lock-icon">🌿</div>
+  <div class="lock-title">カウンセリングシート</div>
+  <p class="lock-desc">LINEでお知らせした<br>パスワードを入力してください</p>
+  <input class="lock-input" type="password" id="lockInput" placeholder="••••••" maxlength="20"
+    onkeydown="if(event.key==='Enter')checkLock()">
+  <div class="lock-err" id="lockErr">パスワードが違います</div>
+  <br>
+  <button class="lock-btn" onclick="checkLock()">入力する</button>
+</div>
+
+<!-- ===== CUSTOMER SCREEN ===== -->
+<div id="customerScreen" class="screen active">
+  <div class="c-header">
+    <div class="c-header-inner">
+      <div style="width:44px"></div>
+      <div class="c-header-center">
+        <h1 id="sheetTitle">Counseling Sheet</h1>
+        <p id="sheetSubtitle">ご記入いただいた情報は施術・サービスにのみ使用いたします</p>
+      </div>
+      <div style="width:44px;display:flex;justify-content:flex-end">
+        <button class="secret-btn" id="secretBtn"></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="prog-wrap">
+    <div class="prog-labels">
+      <span id="progText">0 / 5 セクション完了</span>
+      <span id="progPct">0%</span>
+    </div>
+    <div class="prog-bg"><div class="prog-fill" id="progFill"></div></div>
+  </div>
+
+  <!-- 01 基本情報 -->
+  <div class="section">
+    <div class="sec-hd"><div class="sec-num">1</div><span id="sec1Title">基本情報</span></div>
+    <div class="field">
+      <div class="field-label">ご来店年月日<span class="req">必須</span></div>
+      <input type="date" id="visitDate">
+    </div>
+    <div class="field">
+      <div class="field-label">お名前（フリガナ）</div>
+      <input type="text" id="nameKana" placeholder="ヤマダ ハナコ" style="margin-bottom:8px">
+      <div class="field-label" style="margin-top:4px">お名前</div>
+      <input type="text" id="nameKanji" placeholder="山田 花子">
+    </div>
+    <div class="field">
+      <div class="field-label">生年月日</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <select id="birthYear" style="flex:2">
+          <option value="">年</option>
+        </select>
+        <select id="birthMonth" style="flex:1">
+          <option value="">月</option>
+        </select>
+        <select id="birthDay" style="flex:1">
+          <option value="">日</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-label">電話番号</div>
+      <input type="tel" id="phone" placeholder="090-0000-0000">
+    </div>
+    <div class="field">
+      <div class="field-label">お住まいの市町村</div>
+      <input type="text" id="addr1" placeholder="例：酒田市">
+    </div>
+    <div class="field">
+      <div class="field-label">ご職業</div>
+      <div class="chip-group" data-type="radio" data-key="job">
+        <label class="chip"><input type="radio" name="job">主婦</label>
+        <label class="chip"><input type="radio" name="job">パート</label>
+        <label class="chip"><input type="radio" name="job">会社員</label>
+        <label class="chip"><input type="radio" name="job">自営業</label>
+        <label class="chip"><input type="radio" name="job">学生</label>
+        <label class="chip"><input type="radio" name="job">その他</label>
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-label">ご来店のきっかけ</div>
+      <div class="chip-group" data-type="check" data-key="source">
+        <label class="chip"><input type="checkbox">SNS</label>
+        <label class="chip"><input type="checkbox">紹介</label>
+        <label class="chip"><input type="checkbox">その他</label>
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-label">出産経験</div>
+      <div class="chip-group" data-type="radio" data-key="birth">
+        <label class="chip"><input type="radio" name="birth">有り</label>
+        <label class="chip"><input type="radio" name="birth">無し</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- 02 体の状態 -->
+  <div class="section">
+    <div class="sec-hd"><div class="sec-num">2</div><span id="sec2Title">体の状態</span></div>
+    <div class="field">
+      <div class="field-label">気になる症状（複数選択可）</div>
+      <div class="chip-group" data-type="check" data-key="symptoms">
+        <label class="chip"><input type="checkbox">肩こり</label>
+        <label class="chip"><input type="checkbox">首のこり</label>
+        <label class="chip"><input type="checkbox">頭痛</label>
+        <label class="chip"><input type="checkbox">背中の痛み</label>
+        <label class="chip"><input type="checkbox">目の疲れ・かすみ</label>
+        <label class="chip"><input type="checkbox">手のしびれ</label>
+        <label class="chip"><input type="checkbox">腰痛</label>
+        <label class="chip"><input type="checkbox">便秘</label>
+        <label class="chip"><input type="checkbox">下痢</label>
+        <label class="chip"><input type="checkbox">むくみ</label>
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-label">その他・詳細</div>
+      <input type="text" id="symptomsOther" placeholder="自由にご記入ください">
+    </div>
+    <div class="field">
+      <div class="field-label">運動習慣</div>
+      <div class="scale-group" data-key="exercise">
+        <div class="scale-item"><input type="radio" name="exercise">よくする</div>
+        <div class="scale-item"><input type="radio" name="exercise">ときどき</div>
+        <div class="scale-item"><input type="radio" name="exercise">しない</div>
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-label">食事の回数</div>
+      <div class="scale-group" data-key="meal" style="flex-wrap:nowrap">
+        <div class="scale-item" style="font-size:11px"><input type="radio" name="meal">3食</div>
+        <div class="scale-item" style="font-size:11px"><input type="radio" name="meal">朝抜き</div>
+        <div class="scale-item" style="font-size:11px"><input type="radio" name="meal">不規則</div>
+        <div class="scale-item" style="font-size:11px"><input type="radio" name="meal">間食あり</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 03 嗜好品・お悩み -->
+  <div class="section">
+    <div class="sec-hd"><div class="sec-num">3</div><span id="sec3Title">嗜好品・お悩みの症状</span></div>
+    <div class="field">
+      <div class="field-label">嗜好品（複数選択可）</div>
+      <div class="chip-group" data-type="check" data-key="habits">
+        <label class="chip"><input type="checkbox">お酒</label>
+        <label class="chip"><input type="checkbox">コーヒー</label>
+        <label class="chip"><input type="checkbox">冷たい飲み物（多め）</label>
+        <label class="chip"><input type="checkbox">タバコ</label>
+        <label class="chip"><input type="checkbox">辛い物（多め）</label>
+        <label class="chip"><input type="checkbox">甘い物（多め）</label>
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-label">特にお悩みの症状（複数選択可）</div>
+      <div class="chip-group" data-type="check" data-key="concerns">
+        <label class="chip"><input type="checkbox">便秘</label>
+        <label class="chip"><input type="checkbox">腰痛</label>
+        <label class="chip"><input type="checkbox">ダイエット</label>
+        <label class="chip"><input type="checkbox">自律神経の乱れ</label>
+        <label class="chip"><input type="checkbox">免疫力が低い</label>
+        <label class="chip"><input type="checkbox">肌荒れ・ニキビ</label>
+        <label class="chip"><input type="checkbox">睡眠不良</label>
+        <label class="chip"><input type="checkbox">アレルギー・アトピー</label>
+        <label class="chip"><input type="checkbox">血行が悪い</label>
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-label">アレルギー</div>
+      <div class="chip-group" data-type="radio" data-key="allergy">
+        <label class="chip"><input type="radio" name="allergy">なし</label>
+        <label class="chip"><input type="radio" name="allergy">あり</label>
+      </div>
+      <div id="allergyDetail" style="display:none;margin-top:10px">
+        <input type="text" id="allergyText" placeholder="例：金属（ニッケル）、花粉など">
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-label">あなたの体質</div>
+      <div class="scale-group" data-key="constitution">
+        <div class="scale-item"><input type="radio" name="constitution">順調</div>
+        <div class="scale-item"><input type="radio" name="constitution">やや不調</div>
+        <div class="scale-item"><input type="radio" name="constitution">不調</div>
+        <div class="scale-item"><input type="radio" name="constitution">その他</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 睡眠 -->
+  <div class="section">
+    <div class="sec-hd"><div class="sec-num">4</div><span id="sec4Title">睡眠について</span></div>
+    <div class="field">
+      <div class="field-label">睡眠のリズム</div>
+      <div class="scale-group" data-key="sleepRhythm">
+        <div class="scale-item"><input type="radio" name="sleepRhythm">規則正しい</div>
+        <div class="scale-item"><input type="radio" name="sleepRhythm">不規則</div>
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-label">平均睡眠時間（時間）</div>
+      <input type="number" id="sleepHours" placeholder="例：6" min="1" max="24" style="max-width:120px">
+    </div>
+    <div class="field">
+      <div class="field-label">睡眠の質（複数選択可）</div>
+      <div class="chip-group" data-type="check" data-key="sleepQuality">
+        <label class="chip"><input type="checkbox">熟睡できる</label>
+        <label class="chip"><input type="checkbox">まあまあ眠れる</label>
+        <label class="chip"><input type="checkbox">眠りが浅い</label>
+        <label class="chip"><input type="checkbox">なかなか寝付けない</label>
+        <label class="chip"><input type="checkbox">すっきり起きれない</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- 05 備考 -->
+  <div class="section">
+    <div class="sec-hd"><div class="sec-num">5</div><span id="sec5Title">その他・ご要望</span></div>
+    <div class="field">
+      <div class="field-label">気になること・ご要望など</div>
+      <textarea id="remarks" placeholder="例：右肩が特に気になっています。"></textarea>
+    </div>
+  </div>
+
+  <!-- Policy -->
+  <div class="policy-box">
+    <div class="pol-hd">■ 必読事項</div>
+    <div class="pol-body">
+      <h4>キャンセルについて</h4>
+      <p id="cancelPolicy">2日前のキャンセル：キャンセル料はいただきません。<br>前日の17時までのキャンセル：予約代金の<span class="hl">20%</span>をいただきます。<br>前日17時以降のキャンセル：予約代金の<span class="hl">50%</span>をいただきます。<br>当日のキャンセル：予約代金の<span class="hl">100%</span>をいただきます。<br>無断でのキャンセル：予約代金の<span class="hl">100%</span>をいただきます。</p>
+      <br>
+      <h4>予約時間の遅刻について</h4>
+      <p id="latePolicy">ご予約時間に遅れる場合はお早めに店舗へご連絡をお願いいたします。<br>15分以上遅れた場合、<span class="hl">無断キャンセル</span>と判断させていただく事があります。</p>
+    </div>
+    <div class="agree-wrap">
+      <div class="agree-chip" id="agreeChip">
+        <input type="checkbox" id="agreeCheck">
+        <div class="agree-box" id="agreeBox">✓</div>
+        同意しました
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-bar">
+    <button class="btn-reset" onclick="resetForm()">リセット</button>
+    <button class="btn-submit" onclick="submitForm()">送信する</button>
+  </div>
+
+  <div style="height:30px"></div>
+</div>
+
+<!-- ===== THANKS SCREEN ===== -->
+<div id="thanksScreen" class="screen">
+  <div class="thanks-icon">🌿</div>
+  <div class="thanks-title" id="thanksTitle">ご記入ありがとうございました</div>
+  <div class="thanks-msg" id="thanksMsg">スタッフにお声がけください。<br>カウンセリングを開始いたします。</div>
+</div>
+
+<!-- ===== LOGIN SCREEN ===== -->
+<div id="loginScreen" class="screen">
+  <div class="login-card">
+    <h2>管理者ログイン</h2>
+    <p>オーナー専用ページです</p>
+    <div class="login-field">
+      <label>パスワード</label>
+      <input type="password" id="pwInput" placeholder="パスワードを入力" onkeydown="if(event.key==='Enter')doLogin()" style="font-size:18px;padding:16px 14px;letter-spacing:0.2em">
+    </div>
+    <button class="btn-login" onclick="doLogin()">ログイン</button>
+    <div class="login-err" id="loginErr">パスワードが違います</div>
+    <div class="login-back" onclick="showScreen('customerScreen')">← お客様フォームに戻る</div>
+  </div>
+</div>
+
+<!-- ===== ADMIN SCREEN ===== -->
+<div id="adminScreen" class="screen">
+  <div class="admin-header">
+    <h1>管理画面</h1>
+    <button class="btn-logout" onclick="logout()">ログアウト</button>
+  </div>
+
+  <div class="admin-tabs">
+    <div class="admin-tab active" onclick="switchTab('submissions')">📋 送信一覧</div>
+    <div class="admin-tab" onclick="switchTab('settings')">⚙️ 設定</div>
+  </div>
+
+  <!-- Submissions tab -->
+  <div id="tab-submissions" class="tab-content active">
+    <div id="submissionList"></div>
+  </div>
+
+  <!-- Settings tab -->
+  <div id="tab-settings" class="tab-content">
+
+    <div class="setting-group">
+      <div class="setting-hd">シートのタイトル・説明文</div>
+      <div class="setting-row">
+        <div class="setting-label">タイトル</div>
+        <input type="text" id="st-title" placeholder="Counseling Sheet">
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">サブタイトル</div>
+        <input type="text" id="st-subtitle" placeholder="ご記入いただいた情報は…">
+      </div>
+    </div>
+
+    <div class="setting-group">
+      <div class="setting-hd">セクション名</div>
+      <div class="setting-row"><div class="setting-label">セクション1</div><input type="text" id="st-sec1" placeholder="基本情報"></div>
+      <div class="setting-row"><div class="setting-label">セクション2</div><input type="text" id="st-sec2" placeholder="体の状態"></div>
+      <div class="setting-row"><div class="setting-label">セクション3</div><input type="text" id="st-sec3" placeholder="嗜好品・お悩みの症状"></div>
+      <div class="setting-row"><div class="setting-label">セクション4</div><input type="text" id="st-sec4" placeholder="睡眠について"></div>
+      <div class="setting-row"><div class="setting-label">セクション5</div><input type="text" id="st-sec5" placeholder="その他・ご要望"></div>
+    </div>
+
+    <div class="setting-group">
+      <div class="setting-hd">選択肢のカスタマイズ（カンマ区切りで入力）</div>
+      <div class="setting-row">
+        <div class="setting-label">ご職業</div>
+        <input type="text" id="st-job" placeholder="主婦,パート,会社員,自営業,学生,その他">
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">ご来店のきっかけ</div>
+        <input type="text" id="st-source" placeholder="SNS,紹介,その他">
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">気になる症状</div>
+        <input type="text" id="st-symptoms" placeholder="肩こり,首のこり,頭痛,腰痛,むくみ…">
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">嗜好品</div>
+        <input type="text" id="st-habits" placeholder="お酒,コーヒー,タバコ,甘い物（多め）…">
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">お悩みの症状</div>
+        <input type="text" id="st-concerns" placeholder="便秘,腰痛,ダイエット,肌荒れ・ニキビ…">
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">睡眠の質</div>
+        <input type="text" id="st-sleepQuality" placeholder="熟睡できる,眠りが浅い,なかなか寝付けない…">
+      </div>
+    </div>
+
+    <div class="setting-group">
+      <div class="setting-hd">必読事項（キャンセルポリシー）</div>
+      <div class="setting-row">
+        <div class="setting-label">キャンセルポリシー文</div>
+        <textarea id="st-cancel" placeholder="キャンセルに関する文章"></textarea>
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">遅刻に関する文章</div>
+        <textarea id="st-late" placeholder="遅刻に関する文章"></textarea>
+      </div>
+    </div>
+
+    <div class="setting-group">
+      <div class="setting-hd">送信後のメッセージ</div>
+      <div class="setting-row">
+        <div class="setting-label">タイトル</div>
+        <input type="text" id="st-thanksTitle" placeholder="ご記入ありがとうございました">
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">メッセージ</div>
+        <textarea id="st-thanksMsg" placeholder="スタッフにお声がけください。"></textarea>
+      </div>
+    </div>
+
+    <div class="setting-group">
+      <div class="setting-hd">パスワード変更</div>
+      <div class="setting-row">
+        <div class="pw-field"><label>現在のパスワード</label><input type="password" id="pw-current"></div>
+        <div class="pw-field"><label>新しいパスワード</label><input type="password" id="pw-new"></div>
+        <div class="pw-field"><label>確認</label><input type="password" id="pw-confirm"></div>
+        <div class="login-err" id="pw-err" style="display:none; text-align:left; margin-top:6px"></div>
+      </div>
+    </div>
+
+    <button class="btn-save" onclick="saveSettings()">設定を保存する</button>
+    <div class="save-ok" id="saveOk">✅ 保存しました</div>
+  </div>
+</div>
+
+<!-- ===== PRINT AREA ===== -->
+<div id="printArea"></div>
+
+<script>
+// ── State ──
+const DEFAULT_PW = '120079Ab';
+let settings = {
+  title: 'Counseling Sheet',
+  subtitle: 'ご記入いただいた情報は施術・サービスにのみ使用いたします',
+  sec1: '基本情報', sec2: '体の状態', sec3: '嗜好品・お悩みの症状',
+  sec4: '睡眠について', sec5: 'その他・ご要望',
+  cancelPolicy: '2日前のキャンセル：キャンセル料はいただきません。\n前日の17時までのキャンセル：予約代金の20%をいただきます。\n前日17時以降のキャンセル：予約代金の50%をいただきます。\n当日のキャンセル：予約代金の100%をいただきます。\n無断でのキャンセル：予約代金の100%をいただきます。',
+  latePolicy: 'ご予約時間に遅れる場合はお早めに店舗へご連絡をお願いいたします。\n15分以上遅れた場合、無断キャンセルと判断させていただく事があります。',
+  thanksTitle: 'ご記入ありがとうございました',
+  thanksMsg: 'スタッフにお声がけください。\nカウンセリングを開始いたします。',
+  password: DEFAULT_PW,
+  chips: {
+    job: '主婦,パート,会社員,自営業,学生,その他',
+    source: 'SNS,紹介,その他',
+    symptoms: '肩こり,首のこり,頭痛,背中の痛み,目の疲れ・かすみ,手のしびれ,腰痛,便秘,下痢,むくみ',
+    habits: 'お酒,コーヒー,冷たい飲み物（多め）,タバコ,辛い物（多め）,甘い物（多め）',
+    concerns: '便秘,腰痛,ダイエット,自律神経の乱れ,免疫力が低い,肌荒れ・ニキビ,睡眠不良,アレルギー・アトピー,血行が悪い',
+    sleepQuality: '熟睡できる,まあまあ眠れる,眠りが浅い,なかなか寝付けない,すっきり起きれない'
+  }
+};
+let submissions = [];
+
+// ── Load from localStorage ──
+try {
+  const s = localStorage.getItem('cs_settings');
+  if (s) settings = {...settings, ...JSON.parse(s)};
+  const sub = localStorage.getItem('cs_submissions');
+  if (sub) submissions = JSON.parse(sub);
+} catch(e){}
+
+// ── Apply settings to UI ──
+function renderChipGroup(key, isRadio) {
+  const group = document.querySelector(`[data-key=${key}]`);
+  if (!group || !settings.chips) return;
+  const items = settings.chips[key] ? settings.chips[key].split(',').map(s=>s.trim()).filter(Boolean) : [];
+  const name = key;
+  group.innerHTML = items.map(item =>
+    `<label class="chip"><input type="${isRadio?'radio':'checkbox'}"${isRadio?` name="${name}"`:''}>${item}</label>`
+  ).join('');
+  // Re-attach chip listeners
+  group.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (isRadio) {
+        group.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+        chip.classList.add('selected');
+      } else {
+        chip.classList.toggle('selected');
+      }
+      updateProgress();
+
+// ── Secret button → login ──
+document.getElementById('secretBtn').addEventListener('click', showLogin);
+
+// ── App Lock ──
+const APP_LOCK_PW = 'en2026';
+function checkLock() {
+  const val = document.getElementById('lockInput').value;
+  if (val === APP_LOCK_PW) {
+    document.getElementById('appLock').classList.add('hidden');
+    sessionStorage.setItem('cs_unlocked', '1');
+  } else {
+    const input = document.getElementById('lockInput');
+    input.classList.add('error');
+    document.getElementById('lockErr').style.display = 'block';
+    setTimeout(() => { input.classList.remove('error'); }, 400);
+    input.value = '';
+  }
+}
+if (sessionStorage.getItem('cs_unlocked') === '1') {
+  document.getElementById('appLock').classList.add('hidden');
+}
+    });
+  });
+}
+
+function applySettings() {
+  document.getElementById('sheetTitle').textContent = settings.title;
+  document.getElementById('sheetSubtitle').textContent = settings.subtitle;
+  document.getElementById('sec1Title').textContent = settings.sec1;
+  document.getElementById('sec2Title').textContent = settings.sec2;
+  document.getElementById('sec3Title').textContent = settings.sec3;
+  document.getElementById('sec4Title').textContent = settings.sec4;
+  document.getElementById('sec5Title').textContent = settings.sec5;
+  document.getElementById('thanksTitle').textContent = settings.thanksTitle;
+  document.getElementById('thanksMsg').innerHTML = settings.thanksMsg.replace(/\n/g,'<br>');
+
+  // Policy text (preserve highlights)
+  const cp = document.getElementById('cancelPolicy');
+  cp.innerHTML = settings.cancelPolicy.replace(/\n/g,'<br>').replace(/(\d+%)/g,'<span class="hl">$1</span>');
+  const lp = document.getElementById('latePolicy');
+  lp.innerHTML = settings.latePolicy.replace(/\n/g,'<br>').replace(/無断キャンセル/g,'<span class="hl">無断キャンセル</span>');
+
+  // Re-render chip groups from settings
+  if (settings.chips) {
+    renderChipGroup('job', true);
+    renderChipGroup('source', false);
+    renderChipGroup('symptoms', false);
+    renderChipGroup('habits', false);
+    renderChipGroup('concerns', false);
+    renderChipGroup('sleepQuality', false);
+  }
+}
+applySettings();
+
+// ── Screen switching ──
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function showLogin() {
+  document.getElementById('pwInput').value = '';
+  document.getElementById('loginErr').style.display = 'none';
+  showScreen('loginScreen');
+}
+
+function doLogin() {
+  const pw = document.getElementById('pwInput').value;
+  if (pw === settings.password) {
+    loadSettingsToForm();
+    renderSubmissions();
+    showScreen('adminScreen');
+  } else {
+    document.getElementById('loginErr').style.display = 'block';
+  }
+}
+
+function logout() { showScreen('customerScreen'); }
+
+// ── Tabs ──
+function switchTab(name) {
+  document.querySelectorAll('.admin-tab').forEach((t,i) => {
+    t.classList.toggle('active', ['submissions','settings'][i] === name);
+  });
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+// ── Chips ──
+document.querySelectorAll('.chip-group').forEach(group => {
+  group.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', (e) => {
+      e.preventDefault();
+      const isRadio = chip.querySelector('input[type=radio]');
+      if (isRadio) {
+        group.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+        chip.classList.add('selected');
+      } else {
+        chip.classList.toggle('selected');
+      }
+      updateProgress();
+    });
+  });
+});
+
+// ── Scale ──
+document.querySelectorAll('.scale-group').forEach(group => {
+  group.querySelectorAll('.scale-item').forEach(item => {
+    item.addEventListener('click', () => {
+      group.querySelectorAll('.scale-item').forEach(i => i.classList.remove('selected'));
+      item.classList.add('selected');
+      updateProgress();
+    });
+  });
+});
+
+// ── Agree ──
+document.getElementById('agreeChip').addEventListener('click', () => {
+  const chip = document.getElementById('agreeChip');
+  chip.classList.toggle('selected');
+  document.getElementById('agreeCheck').checked = chip.classList.contains('selected');
+  updateProgress();
+});
+
+// ── Progress ──
+function updateProgress() {
+  let done = 0;
+  if (document.getElementById('visitDate').value) done++;
+  if (document.querySelector('[data-key=exercise] .selected')) done++;
+  if (document.querySelector('[data-key=concerns] .chip.selected')) done++;
+  if (document.querySelector('[data-key=sleepRhythm] .selected')) done++;
+  if (document.getElementById('remarks').value.trim() || document.getElementById('agreeChip').classList.contains('selected')) done++;
+  const pct = Math.round(done/5*100);
+  document.getElementById('progFill').style.width = pct+'%';
+  document.getElementById('progText').textContent = done+' / 5 セクション完了';
+  document.getElementById('progPct').textContent = pct+'%';
+}
+
+document.querySelectorAll('#customerScreen input[type=text],#customerScreen input[type=tel],#customerScreen input[type=date],#customerScreen input[type=number],#customerScreen textarea').forEach(el => {
+  el.addEventListener('input', updateProgress);
+});
+
+// Init date
+document.getElementById('visitDate').value = new Date().toISOString().split('T')[0];
+
+// Init birthdate selects
+(function() {
+  const yEl = document.getElementById('birthYear');
+  const mEl = document.getElementById('birthMonth');
+  const dEl = document.getElementById('birthDay');
+  const now = new Date().getFullYear();
+  for (let y = now; y >= 1920; y--) {
+    const o = document.createElement('option');
+    o.value = y; o.textContent = y + '年';
+    yEl.appendChild(o);
+  }
+  for (let m = 1; m <= 12; m++) {
+    const o = document.createElement('option');
+    o.value = m; o.textContent = m + '月';
+    mEl.appendChild(o);
+  }
+  for (let d = 1; d <= 31; d++) {
+    const o = document.createElement('option');
+    o.value = d; o.textContent = d + '日';
+    dEl.appendChild(o);
+  }
+})();
+
+// Allergy toggle
+document.querySelectorAll('[data-key=allergy] .chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    setTimeout(() => {
+      const sel = document.querySelector('[data-key=allergy] .chip.selected');
+      const detail = document.getElementById('allergyDetail');
+      if (sel && sel.textContent.trim() === 'あり') {
+        detail.style.display = 'block';
+      } else {
+        detail.style.display = 'none';
+        document.getElementById('allergyText').value = '';
+      }
+    }, 50);
+  });
+});
+
+updateProgress();
+
+// ── Collect form data ──
+function collectData() {
+  const chips = (key) => [...document.querySelectorAll(`[data-key=${key}] .chip.selected`)].map(c => c.textContent.trim());
+  const scale = (key) => { const el = document.querySelector(`[data-key=${key}] .selected`); return el ? el.textContent.trim() : ''; };
+  return {
+    visitDate: document.getElementById('visitDate').value,
+    nameKana: document.getElementById('nameKana').value,
+    nameKanji: document.getElementById('nameKanji').value,
+    birthDate: [document.getElementById('birthYear').value, document.getElementById('birthMonth').value, document.getElementById('birthDay').value].filter(Boolean).join('/'),
+    phone: document.getElementById('phone').value,
+    addr1: document.getElementById('addr1').value,
+    job: chips('job'), source: chips('source'), birth: chips('birth'),
+    symptoms: chips('symptoms'), symptomsOther: document.getElementById('symptomsOther').value,
+    exercise: scale('exercise'), meal: scale('meal'),
+    habits: chips('habits'), concerns: chips('concerns'), allergy: chips('allergy'),
+    constitution: scale('constitution'),
+    sleepRhythm: scale('sleepRhythm'),
+    sleepHours: document.getElementById('sleepHours').value,
+    sleepQuality: chips('sleepQuality'),
+    remarks: document.getElementById('remarks').value,
+    agreed: document.getElementById('agreeChip').classList.contains('selected'),
+    submittedAt: new Date().toLocaleString('ja-JP')
+  };
+}
+
+// ── Submit ──
+async function submitForm() {
+  if (!document.getElementById('visitDate').value) {
+    alert('ご来店年月日を入力してください。'); return;
+  }
+  if (!document.getElementById('agreeChip').classList.contains('selected')) {
+    alert('必読事項に同意してください。'); return;
+  }
+  const data = collectData();
+  const btn = document.querySelector('.btn-submit');
+  btn.textContent = '送信中…';
+  btn.disabled = true;
+
+  const body = {
+    '_subject': `【カウンセリングシート】${data.nameKanji || '新規'}さん`,
+    'ご来店日': data.visitDate,
+    'お名前': `${data.nameKanji}（${data.nameKana}）`,
+    '生年月日': data.birthDate,
+    '電話番号': data.phone,
+    'ご住所': [data.zip, data.addr1, data.addr2].filter(Boolean).join(' '),
+    'ご職業': data.job.join('、'),
+    'ご来店のきっかけ': data.source.join('、'),
+    '出産経験': data.birth.join('、'),
+    '気になる症状': [...data.symptoms, data.symptomsOther].filter(Boolean).join('、'),
+    '運動習慣': data.exercise,
+    '食事の回数': data.meal,
+    '嗜好品': data.habits.join('、'),
+    'お悩みの症状': data.concerns.join('、'),
+    'アレルギー': data.allergy.join('、'),
+    '体質': data.constitution,
+    '睡眠リズム': data.sleepRhythm,
+    '睡眠時間': data.sleepHours ? data.sleepHours + '時間' : '',
+    '睡眠の質': data.sleepQuality.join('、'),
+    'ご要望・備考': data.remarks,
+    '同意': data.agreed ? '同意しました' : '未同意',
+    '送信日時': data.submittedAt,
+  };
+
+  try {
+    const res = await fetch('https://formspree.io/f/xkoebejo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (res.ok) {
+      submissions.push(data);
+      try { localStorage.setItem('cs_submissions', JSON.stringify(submissions)); } catch(e){}
+      showScreen('thanksScreen');
+    } else {
+      throw new Error('failed');
+    }
+  } catch(e) {
+    alert('送信に失敗しました。通信状況を確認してもう一度お試しください。');
+    btn.textContent = '送信する';
+    btn.disabled = false;
+  }
+}
+
+// ── Reset ──
+function resetForm() {
+  if (!confirm('入力内容をすべてリセットしますか？')) return;
+  document.querySelectorAll('#customerScreen input[type=text],#customerScreen input[type=tel],#customerScreen input[type=number]').forEach(i => i.value='');
+  document.querySelectorAll('#customerScreen textarea').forEach(t => t.value='');
+  document.querySelectorAll('#customerScreen .chip').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('#customerScreen .scale-item').forEach(i => i.classList.remove('selected'));
+  document.getElementById('agreeChip').classList.remove('selected');
+  document.getElementById('visitDate').value = new Date().toISOString().split('T')[0];
+  updateProgress();
+}
+
+// ── Render submissions ──
+function renderSubmissions() {
+  const list = document.getElementById('submissionList');
+  if (!submissions.length) {
+    list.innerHTML = '<div class="no-data">まだ送信されたシートはありません</div>'; return;
+  }
+  list.innerHTML = [...submissions].reverse().map((s, ri) => {
+    const i = submissions.length - 1 - ri;
+    const tags = [...(s.symptoms||[]), ...(s.concerns||[])].slice(0,4);
+    return `<div class="sub-card">
+      <div class="sub-card-hd">
+        <span class="sub-name">${s.nameKanji||'（お名前なし）'}</span>
+        <span class="sub-date">${s.submittedAt||''}</span>
+      </div>
+      <div style="font-size:12px; color:var(--muted); margin-bottom:8px">ご来店：${s.visitDate||'―'} / ${s.phone||'電話番号なし'}</div>
+      ${tags.length ? `<div class="sub-tags">${tags.map(t=>`<span class="sub-tag">${t}</span>`).join('')}</div>` : ''}
+      <button class="btn-pdf" onclick="printSubmission(${i})">📄 PDFで印刷・保存</button>
+    </div>`;
+  }).join('');
+}
+
+// ── Print a submission ──
+function printSubmission(idx) {
+  const s = submissions[idx];
+  const row = (label, value) => value ? `<tr><td class="lbl">${label}</td><td>${value}</td></tr>` : '';
+  const chips = (arr) => arr && arr.length ? `<div class="print-chips">${arr.map(v=>`<span class="print-chip">${v}</span>`).join('')}</div>` : '―';
+  const cp = settings.cancelPolicy.replace(/\n/g,'<br>').replace(/(\d+%)/g,'<span class="hl">$1</span>');
+  const lp = settings.latePolicy.replace(/\n/g,'<br>').replace(/無断キャンセル/g,'<span class="hl">無断キャンセル</span>');
+
+  document.getElementById('printArea').innerHTML = `
+    <div class="print-title">${settings.title}</div>
+    <div class="print-sub">${settings.subtitle}</div>
+    <table class="print-table">
+      ${row('ご来店日', s.visitDate)}
+      ${row('お名前', s.nameKanji+(s.nameKana?` （${s.nameKana}）`:''))}
+      ${row('生年月日', s.birthDate)}
+      ${row('電話番号', s.phone)}
+      ${row('お住まいの市町村', s.addr1||'')}
+      <tr><td class="lbl">ご職業</td><td>${chips(s.job)}</td></tr>
+      <tr><td class="lbl">ご来店のきっかけ</td><td>${chips(s.source)}</td></tr>
+      <tr><td class="lbl">出産経験</td><td>${chips(s.birth)}</td></tr>
+      <tr><td class="lbl">気になる症状</td><td>${chips(s.symptoms)}${s.symptomsOther?` <br>${s.symptomsOther}`:''}</td></tr>
+      <tr><td class="lbl">運動習慣</td><td>${s.exercise||'―'}</td></tr>
+      <tr><td class="lbl">食事の回数</td><td>${s.meal||'―'}</td></tr>
+      <tr><td class="lbl">嗜好品</td><td>${chips(s.habits)}</td></tr>
+      <tr><td class="lbl">お悩みの症状</td><td>${chips(s.concerns)}</td></tr>
+      <tr><td class="lbl">アレルギー</td><td>${chips(s.allergy)}</td></tr>
+      <tr><td class="lbl">体質</td><td>${s.constitution||'―'}</td></tr>
+      <tr><td class="lbl">睡眠リズム</td><td>${s.sleepRhythm||'―'}${s.sleepHours?` / 約${s.sleepHours}時間`:''}</td></tr>
+      <tr><td class="lbl">睡眠の質</td><td>${chips(s.sleepQuality)}</td></tr>
+      ${row('ご要望・備考', s.remarks)}
+    </table>
+    <div class="print-policy">
+      <h4>■ キャンセルについて</h4><p>${cp}</p><br>
+      <h4>■ 予約時間の遅刻について</h4><p>${lp}</p>
+    </div>
+    <div class="print-agree">${s.agreed ? '☑ 同意しました' : '□ 同意しました'}</div>
+    <div style="font-size:9pt; color:#999; margin-top:8pt; text-align:right;">送信日時：${s.submittedAt}</div>
+  `;
+  window.print();
+}
+
+// ── Settings form ──
+function loadSettingsToForm() {
+  document.getElementById('st-title').value = settings.title;
+  document.getElementById('st-subtitle').value = settings.subtitle;
+  document.getElementById('st-sec1').value = settings.sec1;
+  document.getElementById('st-sec2').value = settings.sec2;
+  document.getElementById('st-sec3').value = settings.sec3;
+  document.getElementById('st-sec4').value = settings.sec4;
+  document.getElementById('st-sec5').value = settings.sec5;
+  document.getElementById('st-cancel').value = settings.cancelPolicy;
+  document.getElementById('st-late').value = settings.latePolicy;
+  document.getElementById('st-thanksTitle').value = settings.thanksTitle;
+  document.getElementById('st-thanksMsg').value = settings.thanksMsg;
+  if (settings.chips) {
+    document.getElementById('st-job').value = settings.chips.job || '';
+    document.getElementById('st-source').value = settings.chips.source || '';
+    document.getElementById('st-symptoms').value = settings.chips.symptoms || '';
+    document.getElementById('st-habits').value = settings.chips.habits || '';
+    document.getElementById('st-concerns').value = settings.chips.concerns || '';
+    document.getElementById('st-sleepQuality').value = settings.chips.sleepQuality || '';
+  }
+}
+
+function saveSettings() {
+  // Password change
+  const cur = document.getElementById('pw-current').value;
+  const nw = document.getElementById('pw-new').value;
+  const conf = document.getElementById('pw-confirm').value;
+  const pwErr = document.getElementById('pw-err');
+  pwErr.style.display = 'none';
+
+  if (cur || nw || conf) {
+    if (cur !== settings.password) { pwErr.textContent = '現在のパスワードが違います'; pwErr.style.display='block'; return; }
+    if (!nw) { pwErr.textContent = '新しいパスワードを入力してください'; pwErr.style.display='block'; return; }
+    if (nw !== conf) { pwErr.textContent = 'パスワードが一致しません'; pwErr.style.display='block'; return; }
+    settings.password = nw;
+    document.getElementById('pw-current').value = '';
+    document.getElementById('pw-new').value = '';
+    document.getElementById('pw-confirm').value = '';
+  }
+
+  settings.title = document.getElementById('st-title').value || settings.title;
+  settings.subtitle = document.getElementById('st-subtitle').value || settings.subtitle;
+  settings.sec1 = document.getElementById('st-sec1').value || settings.sec1;
+  settings.sec2 = document.getElementById('st-sec2').value || settings.sec2;
+  settings.sec3 = document.getElementById('st-sec3').value || settings.sec3;
+  settings.sec4 = document.getElementById('st-sec4').value || settings.sec4;
+  settings.sec5 = document.getElementById('st-sec5').value || settings.sec5;
+  settings.cancelPolicy = document.getElementById('st-cancel').value || settings.cancelPolicy;
+  settings.latePolicy = document.getElementById('st-late').value || settings.latePolicy;
+  settings.thanksTitle = document.getElementById('st-thanksTitle').value || settings.thanksTitle;
+  settings.thanksMsg = document.getElementById('st-thanksMsg').value || settings.thanksMsg;
+
+  if (!settings.chips) settings.chips = {};
+  if (document.getElementById('st-job').value) settings.chips.job = document.getElementById('st-job').value;
+  if (document.getElementById('st-source').value) settings.chips.source = document.getElementById('st-source').value;
+  if (document.getElementById('st-symptoms').value) settings.chips.symptoms = document.getElementById('st-symptoms').value;
+  if (document.getElementById('st-habits').value) settings.chips.habits = document.getElementById('st-habits').value;
+  if (document.getElementById('st-concerns').value) settings.chips.concerns = document.getElementById('st-concerns').value;
+  if (document.getElementById('st-sleepQuality').value) settings.chips.sleepQuality = document.getElementById('st-sleepQuality').value;
+
+  try { localStorage.setItem('cs_settings', JSON.stringify(settings)); } catch(e){}
+  applySettings();
+
+  const ok = document.getElementById('saveOk');
+  ok.style.display = 'block';
+  setTimeout(()=>ok.style.display='none', 2500);
+}
+</script>
+</body>
+</html>
