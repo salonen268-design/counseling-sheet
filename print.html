@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>カウンセリングシート - 印刷</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green: #8B7355;
+  --gold: #C4A96A;
+  --bg: #F5EDE0;
+  --text: #1a1a1a;
+  --muted: #777;
+  --border: #ddd;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Noto Serif JP', serif;
+  background: var(--bg);
+  color: var(--text);
+  padding: 20px 16px 40px;
+}
+
+.page {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  padding: 24px 0 20px;
+  border-bottom: 2px solid var(--green);
+  margin-bottom: 20px;
+}
+
+.logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 28px;
+  color: var(--green);
+  margin-bottom: 2px;
+}
+
+.sheet-title {
+  font-size: 13px;
+  letter-spacing: 0.3em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.visit-date {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Section */
+.section {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+
+.sec-hd {
+  background: var(--green);
+  color: white;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.row {
+  display: flex;
+  border-bottom: 1px solid #f0e8d8;
+  min-height: 36px;
+}
+
+.row:last-child { border-bottom: none; }
+
+.row-label {
+  background: #faf5ed;
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 600;
+  padding: 10px 12px;
+  width: 110px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  letter-spacing: 0.05em;
+}
+
+.row-value {
+  padding: 10px 12px;
+  font-size: 13px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  line-height: 1.6;
+}
+
+.chip {
+  background: var(--green);
+  color: white;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+/* Policy */
+.policy {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 14px;
+  font-size: 11px;
+  line-height: 1.9;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+
+.policy h4 {
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  border-left: 3px solid var(--green);
+  padding-left: 8px;
+  color: var(--green);
+}
+
+.policy .hl { color: #c0392b; font-weight: 700; }
+
+.agree-box {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 14px;
+  border: 2px solid var(--green);
+  border-radius: 8px;
+  margin-top: 6px;
+  color: var(--green);
+}
+
+/* Print button */
+.print-btn {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  background: var(--green);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-family: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.1em;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.back-btn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+}
+
+.no-data {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+@media print {
+  body { background: white; padding: 0; }
+  .print-btn, .back-btn { display: none; }
+  .section, .policy { box-shadow: none; border: 1px solid #ddd; }
+  .sec-hd { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .chip { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+</head>
+<body>
+<div class="page" id="page">
+  <div class="no-data" id="noData" style="display:none">
+    データが見つかりませんでした
+  </div>
+</div>
+
+<script>
+function decode(str) {
+  try { return decodeURIComponent(str); } catch(e) { return str; }
+}
+
+function parseParams() {
+  const hash = window.location.hash.slice(1);
+  if (!hash) return null;
+  try {
+    return JSON.parse(decode(hash));
+  } catch(e) {}
+  const params = {};
+  hash.split('&').forEach(p => {
+    const [k, v] = p.split('=');
+    if (k) params[decode(k)] = decode(v || '');
+  });
+  return params;
+}
+
+function chips(arr) {
+  if (!arr || !arr.length) return '<span style="color:#aaa">―</span>';
+  if (typeof arr === 'string') {
+    return `<span class="chip">${arr}</span>`;
+  }
+  return arr.map(v => `<span class="chip">${v}</span>`).join('');
+}
+
+function row(label, value) {
+  if (!value || value === '―' || value === 'undefined') return '';
+  return `<div class="row">
+    <div class="row-label">${label}</div>
+    <div class="row-value">${value}</div>
+  </div>`;
+}
+
+function rowChips(label, arr) {
+  if (!arr || !arr.length) return '';
+  return `<div class="row">
+    <div class="row-label">${label}</div>
+    <div class="row-value">${chips(arr)}</div>
+  </div>`;
+}
+
+const data = parseParams();
+
+if (!data) {
+  document.getElementById('noData').style.display = 'block';
+} else {
+  const page = document.getElementById('page');
+  page.innerHTML = `
+    <div class="header">
+      <div class="logo">salon en.</div>
+      <div class="sheet-title">COUNSELING SHEET</div>
+      ${data.visitDate ? `<div class="visit-date">ご来店日：${data.visitDate}</div>` : ''}
+    </div>
+
+    <div class="section">
+      <div class="sec-hd">基本情報</div>
+      ${row('お名前', data.nameKanji + (data.nameKana ? `（${data.nameKana}）` : ''))}
+      ${row('生年月日', data.birthDate)}
+      ${row('電話番号', data.phone)}
+      ${row('お住まいの市町村', data.addr1)}
+      ${rowChips('ご職業', data.job)}
+      ${rowChips('来店のきっかけ', data.source)}
+      ${rowChips('出産経験', data.birth)}
+    </div>
+
+    <div class="section">
+      <div class="sec-hd">体の状態</div>
+      ${rowChips('気になる症状', data.symptoms)}
+      ${data.symptomsOther ? row('その他', data.symptomsOther) : ''}
+      ${row('運動習慣', data.exercise ? `<span class="chip">${data.exercise}</span>` : '')}
+      ${row('食事の回数', data.meal ? `<span class="chip">${data.meal}</span>` : '')}
+    </div>
+
+    <div class="section">
+      <div class="sec-hd">嗜好品・お悩みの症状</div>
+      ${rowChips('嗜好品', data.habits)}
+      ${rowChips('お悩みの症状', data.concerns)}
+      ${row('アレルギー', data.allergy)}
+      ${row('体質', data.constitution ? `<span class="chip">${data.constitution}</span>` : '')}
+    </div>
+
+    <div class="section">
+      <div class="sec-hd">睡眠について</div>
+      ${row('睡眠リズム', data.sleepRhythm ? `<span class="chip">${data.sleepRhythm}</span>` : '')}
+      ${row('睡眠時間', data.sleepHours ? `約${data.sleepHours}時間` : '')}
+      ${rowChips('睡眠の質', data.sleepQuality)}
+    </div>
+
+    ${data.remarks ? `<div class="section">
+      <div class="sec-hd">ご要望・備考</div>
+      <div class="row"><div class="row-value" style="padding:12px">${data.remarks}</div></div>
+    </div>` : ''}
+
+
+
+    <div style="font-size:10px; color:#aaa; text-align:right; margin-bottom:16px;">送信日時：${data.submittedAt || ''}</div>
+
+    <button class="print-btn" onclick="window.print()">📄 PDFとして保存 / 印刷</button>
+    <button class="back-btn" onclick="history.back()">← 戻る</button>
+  `;
+}
+</script>
+</body>
+</html>
